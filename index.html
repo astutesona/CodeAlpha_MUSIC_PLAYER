@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Music Player</title>
+
+<style>
+    body{
+        font-family: Arial, sans-serif;
+        background-image: url("back.jpg");
+        background-size: cover;
+        background-position: center;
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    /* Thumbnail style for playlist */
+    .thumb{
+        width: 40px;
+        height: 40px;
+        border-radius: 6px;
+        object-fit: cover;
+    }
+
+    .track{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px;
+        cursor: pointer;
+        border-bottom: 1px solid #333;
+    }
+    .track:hover{
+        background: #333;
+    }
+
+    .player{
+        width: 330px;
+        background: rgba(0,0,0,0.8);
+        padding: 25px;
+        border-radius: 20px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
+
+    .song-info{
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    .song-title{
+        font-size: 20px;
+        font-weight: bold;
+    }
+    .song-artist{
+        font-size: 14px;
+        color: #bbb;
+    }
+
+    .controls{
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin: 18px 0;
+    }
+
+    button{
+        background: #333;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 50%;
+        color: #fff;
+        cursor: pointer;
+        font-size: 18px;
+    }
+    button:hover{
+        background: #444;
+    }
+
+    .playlist{
+        margin-top: 15px;
+        background: #111;
+        padding: 10px;
+        border-radius: 10px;
+    }
+    .playlist h3{
+        margin: 5px 0 10px;
+        font-size: 16px;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="player">
+
+    <div class="song-info">
+        <div class="song-title">MIDDLE OF THE NIGHT</div>
+        <div class="song-artist">Elley Duhe</div>
+
+        <img id="songImg" src="middle.png" 
+             style="width:120px; height:120px; border-radius:10px; margin:10px auto; display:block;">
+    </div>
+
+ 
+    <input type="range" id="progress" value="0">
+
+
+    <div class="controls">
+        <button onclick="previousSong()">⏮</button>
+        <button onclick="togglePlay()">⏯</button>
+        <button onclick="nextSong()">⏭</button>
+    </div>
+
+   
+    <label>Volume</label>
+    <input type="range" id="volume" min="0" max="1" step="0.05" value="1">
+
+    
+    <div class="playlist">
+        <h3>Playlist</h3>
+
+        <div class="track" onclick="playFromPlaylist(0)">
+            <img src="middle.png" class="thumb">
+            MIDDLE OF THE NIGHT
+        </div>
+
+        <div class="track" onclick="playFromPlaylist(1)">
+            <img src="love.png" class="thumb">
+          LOVE  YOURSELF
+        </div>
+
+        <div class="track" onclick="playFromPlaylist(2)">
+            <img src="sorry.png" class="thumb">
+          SORRY
+        </div>
+    </div>
+
+</div>
+
+<script>
+let audio = new Audio();
+let autoplay = true;
+
+
+let playlist = [
+    { title: "MIDDLE OF THE NIGHT", artist: "Elley Duhe", src: "mid.mp3", img: "middle.png" },
+    { title: "Love YOURSELF", artist: "Justine Biebber", src: "love.mp4", img: "love.png" },
+    { title: "SORRY", artist: "Justin Biebber", src: "sorry.mp4", img: "sorry.png" }
+];
+
+let index = 0;
+loadSong(index);
+
+function loadSong(i){
+    audio.src = playlist[i].src;
+    document.querySelector(".song-title").innerText = playlist[i].title;
+    document.querySelector(".song-artist").innerText = playlist[i].artist;
+
+
+    document.getElementById("songImg").src = playlist[i].img;
+
+    audio.load();
+}
+
+
+function togglePlay(){
+    if(audio.paused){
+        audio.play();
+    }else{
+        audio.pause();
+    }
+}
+
+
+function nextSong(){
+    index = (index + 1) % playlist.length;
+    loadSong(index);
+    audio.play();
+}
+
+
+function previousSong(){
+    index = (index - 1 + playlist.length) % playlist.length;
+    loadSong(index);
+    audio.play();
+}
+
+
+document.getElementById("volume").oninput = function(){
+    audio.volume = this.value;
+};
+
+
+audio.addEventListener("timeupdate", () => {
+    let progress = document.getElementById("progress");
+    progress.value = audio.currentTime / audio.duration * 100;
+});
+
+
+document.getElementById("progress").oninput = function(){
+    audio.currentTime = audio.duration * (this.value / 100);
+};
+
+
+audio.addEventListener("ended", () => {
+    if(autoplay) nextSong();
+});
+
+function playFromPlaylist(i){
+    index = i;
+    loadSong(index);
+    audio.play();
+}
+</script>
+
+</body>
+</html>
